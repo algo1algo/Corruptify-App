@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corruptify</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div>
+          <h1>Corruptify</h1>
+          <p class="subtitle">Corrupt audio and video files</p>
+        </div>
+        <button class="btn btn-secondary" id="viewLogsBtn" style="margin-top: 0;">View Logs</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- File Input Section -->
+      <section class="file-section">
+        <div class="file-input-area" id="fileInputArea">
+          <div class="file-input-content">
+            <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <p class="file-input-text">Drag and drop files here</p>
+            <p class="file-input-subtext">or</p>
+            <button class="btn btn-primary" id="addFilesBtn">Add Files</button>
+          </div>
+        </div>
+        
+        <div class="file-list" id="fileList"></div>
+      </section>
+
+      <!-- Corruption Type Selection -->
+      <section class="corruption-section">
+        <h2>Corruption Type & Level</h2>
+        <div class="corruption-options" id="corruptionOptions">
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="truncated" checked>
+              <div class="option-content">
+                <span class="option-title">Truncated</span>
+                <span class="option-desc">Simulates partial upload/incomplete download</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="truncated" min="1" max="10" value="5" class="level-slider">
+              <span class="slider-value">5</span>
+            </div>
+          </div>
+          
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="header_garbled">
+              <div class="option-content">
+                <span class="option-title">Header Garbled</span>
+                <span class="option-desc">Garbled container header/EBML</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="header_garbled" min="1" max="10" value="5" class="level-slider">
+              <span class="slider-value">5</span>
+            </div>
+          </div>
+          
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="midstream_corrupt">
+              <div class="option-content">
+                <span class="option-title">Mid-stream Corrupt</span>
+                <span class="option-desc">Random bytes scattered throughout file</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="midstream_corrupt" min="1" max="10" value="5" class="level-slider">
+              <span class="slider-value">5</span>
+            </div>
+          </div>
+          
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="short_container">
+              <div class="option-content">
+                <span class="option-title">Short Container</span>
+                <span class="option-desc">Container says longer than actual file</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="short_container" min="1" max="10" value="5" class="level-slider">
+              <span class="slider-value">5</span>
+            </div>
+          </div>
+          
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="no_reindex">
+              <div class="option-content">
+                <span class="option-title">Broken Index</span>
+                <span class="option-desc">Broken index/seek table</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="no_reindex" min="1" max="10" value="5" class="level-slider">
+              <span class="slider-value">5</span>
+            </div>
+          </div>
+
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="av_desync">
+              <div class="option-content">
+                <span class="option-title">AV Desync / Drop</span>
+                <span class="option-desc">Shift or drop segments to misalign audio and video</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="av_desync" min="1" max="10" value="5" class="level-slider">
+              <span class="slider-value">5</span>
+            </div>
+          </div>
+
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="bitflip_scatter">
+              <div class="option-content">
+                <span class="option-title">Bitflip Scatter</span>
+                <span class="option-desc">Random bit flips throughout the file</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="bitflip_scatter" min="1" max="10" value="5" class="level-slider">
+              <span class="slider-value">5</span>
+            </div>
+          </div>
+
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="metadata_mangle">
+              <div class="option-content">
+                <span class="option-title">Metadata Mangle</span>
+                <span class="option-desc">Strip/garble container and tag metadata</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="metadata_mangle" min="1" max="10" value="5" class="level-slider">
+              <span class="slider-value">5</span>
+            </div>
+          </div>
+
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="freeze_frame">
+              <div class="option-content">
+                <span class="option-title">Freeze / Duplicate</span>
+                <span class="option-desc">Insert freeze frames / duplicate GOPs to stutter playback</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="freeze_frame" min="1" max="10" value="5" class="level-slider">
+              <span class="slider-value">5</span>
+            </div>
+          </div>
+
+          <div class="corruption-option-wrapper">
+            <label class="corruption-option">
+              <input type="radio" name="corruptionType" value="surprise_corrupt">
+              <div class="option-content">
+                <span class="option-title">Surprise Corrupt</span>
+                <span class="option-desc">Random mix of multiple corruptions</span>
+              </div>
+            </label>
+            <div class="option-slider">
+              <input type="range" data-type="surprise_corrupt" min="1" max="10" value="7" class="level-slider">
+              <span class="slider-value">7</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Process Button -->
+      <section class="action-section">
+        <button class="btn btn-process" id="processBtn" disabled>Process Files</button>
+      </section>
+
+      <!-- Progress Spinner -->
+      <section class="progress-section" id="progressSection" style="display: none;">
+        <div class="spinner"></div>
+        <p class="progress-text">Processing files...</p>
+      </section>
+
+      <!-- Result Messages -->
+      <section class="results-section" id="resultsSection"></section>
+    </main>
+  </div>
+
+  <!-- Log Viewer Modal -->
+  <div id="logModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Application Logs</h2>
+        <button class="modal-close" id="closeLogModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 10px;">
+          <button class="btn btn-secondary" id="refreshLogsBtn">Refresh</button>
+          <button class="btn btn-secondary" id="openLogFolderBtn" style="margin-left: 10px;">Open Log Folder</button>
+        </div>
+        <div id="logContent" style="background: #1a1a1a; padding: 15px; border-radius: 4px; max-height: 500px; overflow-y: auto; font-family: monospace; font-size: 0.85em; color: #e0e0e0; white-space: pre-wrap; word-break: break-word;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
+

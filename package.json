@@ -1,0 +1,74 @@
+{
+  "name": "corruptify-app",
+  "version": "1.2.1",
+  "description": "Desktop app for corrupting audio and video files",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "build": "tsc && tsc -p tsconfig.renderer.json && npm run copy-assets",
+    "copy-assets": "node scripts/copy-assets.js",
+    "start": "npm run build && electron .",
+    "dev": "tsc && tsc -p tsconfig.renderer.json && npm run copy-assets && electron .",
+    "package": "npm run build && electron-builder",
+    "package:mac": "npm run build && electron-builder --mac",
+    "package:win": "npm run build && electron-builder --win",
+    "package:linux": "npm run build && electron-builder --linux"
+  },
+  "keywords": [
+    "audio",
+    "video",
+    "corruption",
+    "desktop"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "typescript": "^5.3.3"
+  },
+  "build": {
+    "appId": "com.algo1alg0.corruptify",
+    "productName": "Corruptify",
+    "copyright": "Copyright © 2025 algo1alg0",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "src/assets/**/*",
+      "node_modules/**/*",
+      "!node_modules/**/*.{md,ts,map}"
+    ],
+    "extraResources": [
+      {
+        "from": "ffmpeg/ffmpeg",
+        "to": "ffmpeg"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "src/assets/icon.icns",
+      "identity": null
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "src/assets/icon.icns"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "src/assets/icon.icns"
+    }
+  }
+}
+

@@ -1,6 +1,6 @@
 {
   "name": "corruptify-app",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Desktop app for corrupting audio and video files",
   "main": "dist/main/main.js",
   "scripts": {

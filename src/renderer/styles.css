@@ -39,6 +39,15 @@ header h1 {
   font-size: 1.1em;
 }
 
+.branding-text {
+  font-size: 0.8em;
+  color: #888;
+  opacity: 0.7;
+  font-weight: 400;
+  font-style: italic;
+  white-space: nowrap;
+}
+
 main {
   padding: 30px;
 }

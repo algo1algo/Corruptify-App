@@ -317,41 +317,40 @@ async function createShortContainer(
   }
 }
 
-// Get diagnostics using ffprobe
+// Get diagnostics using ffmpeg (ffprobe is not bundled)
 async function getDiagnostics(filePath: string, corruptionType: CorruptionType): Promise<string | undefined> {
   const hasFFmpeg = await checkFFmpeg();
   if (!hasFFmpeg) return undefined;
 
   try {
     const ffmpegPath = getFFmpegPath();
-    const ffprobePath = ffmpegPath.replace('ffmpeg', 'ffprobe');
-    const probeCommand = `"${ffprobePath}" -v error -show_format -show_streams -of json "${filePath}" 2>&1 || "${ffmpegPath}" -v error -f null -i "${filePath}" 2>&1`;
-    
+    // Use ffmpeg to analyze the file — reads input and discards output
+    const probeCommand = `"${ffmpegPath}" -v error -i "${filePath}" -f null - 2>&1`;
+
     try {
       const { stdout, stderr } = await execAsync(probeCommand);
-      const output = stdout || stderr || '';
-      if (output.includes('Invalid data found') || output.includes('moov atom not found') || output.includes('truncated')) {
-        return `Diagnostics: File appears corrupted - ${corruptionType} corruption detected. Error: ${output.substring(0, 200)}`;
+      const output = (stdout || '') + (stderr || '');
+      if (output.trim().length === 0) {
+        return `Diagnostics: File decoded without errors. Corruption type: ${corruptionType} — corruption may be subtle or structural.`;
       }
-      try {
-        const json = JSON.parse(output);
-        if (json.format && json.format.duration) {
-          return `Diagnostics: File structure detected. Duration: ${json.format.duration}s. Corruption type: ${corruptionType}`;
-        }
-      } catch {
-        if (output.length > 0) return `Diagnostics: ${output.substring(0, 300)}`;
+      const corruptionKeywords = ['Invalid', 'truncated', 'moov', 'broken', 'error', 'corrupt', 'missing', 'failed'];
+      const isCorrupted = corruptionKeywords.some(kw => output.toLowerCase().includes(kw.toLowerCase()));
+      if (isCorrupted) {
+        return `Diagnostics: Corruption confirmed! ${corruptionType} caused:\n${output.substring(0, 400)}`;
       }
+      return `Diagnostics: ${output.substring(0, 400)}`;
     } catch (error: any) {
-      const errorMsg = error.stderr || error.stdout || error.message || '';
-      if (errorMsg.includes('Invalid') || errorMsg.includes('truncated') || errorMsg.includes('moov')) {
-        return `Diagnostics: Corruption confirmed! ${corruptionType} caused: ${errorMsg.substring(0, 200)}`;
+      const errorMsg = (error.stderr || '') + (error.stdout || '') + (error.message || '');
+      const corruptionKeywords = ['Invalid', 'truncated', 'moov', 'broken', 'error', 'corrupt', 'missing'];
+      const isCorrupted = corruptionKeywords.some(kw => errorMsg.toLowerCase().includes(kw.toLowerCase()));
+      if (isCorrupted) {
+        return `Diagnostics: Corruption confirmed! ${corruptionType} caused:\n${errorMsg.substring(0, 400)}`;
       }
-      return `Diagnostics: File validation failed - ${errorMsg.substring(0, 200)}`;
+      return `Diagnostics: File validation result:\n${errorMsg.substring(0, 400)}`;
     }
   } catch {
     return undefined;
   }
-  return undefined;
 }
 
 // 6) AV Desync / Drop Segments
